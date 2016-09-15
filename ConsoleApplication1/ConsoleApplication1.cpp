@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	ofstream out_file;
 	string str_tmp;
 
-	/*if (argc > 1) {
+	if (argc > 1) {
 		html_file.open(argv[1]);
 		if (!html_file.is_open()) {
 			cout << "HTML file can not be opened." << endl;
@@ -31,9 +31,6 @@ int main(int argc, char* argv[]) {
 		system("pause");
 		return -2;
 	}
-*/
-
-	html_file.open("F:\\магистратура\\проектирование_сетевых_и_многопоточных_приложений\\входные_данные_и_результаты_лр1-лр2\\in.html");
 
 	out_file.open("out_openmp.txt", ios::trunc);
 
@@ -42,30 +39,28 @@ int main(int argc, char* argv[]) {
 		arr.push_back(str_tmp);
 	}
 
-	ans.reserve(arr.size());
+	omp_set_num_threads(2);
 
-	vector<string>::iterator temp_it = ans.begin();
-
-	#pragma omp parallel for num_threads(2)
-	
-	for (int k = 0; k < arr.size(); k++) {
-		string text = "";
-		char ch = '\0';
-		bool b = true;
-		for (unsigned int i = 0; i < arr[k].length(); i++) {
-			ch = arr[k][i];
-			if (ch == '<') b = false;
-			if (ch == '>') {
-				b = true;
-				continue;
+	#pragma omp parallel for
+				for (int k = 0; k < arr.size(); ++k) {
+				string text = "";
+				char ch = '\0';
+				bool b = true;
+				for (unsigned int i = 0; i < arr[k].length(); i++) {
+					ch = arr[k][i];
+					if (ch == '<') b = false;
+					if (ch == '>') {
+						b = true;
+						continue;
+					}
+					if (b) text += ch;
+				}
+				arr[k] = text; 
+				cout << arr[k] << endl;
 			}
-			if (b) text += ch;
-		}
-		ans.insert(temp_it + k, text);
-	}
-
-	for (unsigned int k = 0; k < ans.size(); k++)
-		out_file << ans[k] << endl;
+	
+	for (int i = 0; i < ans.size(); i++)
+		out_file << arr[i] << endl;
 
 	html_file.close();
 	out_file.close();
